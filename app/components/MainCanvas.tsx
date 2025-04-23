@@ -31,7 +31,9 @@ export default function MainCanvas() {
                 maxWebWorkers: 1,
                 beforeSend: (xhr, imageId, defaultHeaders) => {
                     // Add authorization token to requests
-                    xhr.setRequestHeader('Authorization', 'Bearer DICOM_TOKEN<<');
+                    if (process.env.DICOM_AUTH_TOKEN) {
+                        xhr.setRequestHeader('Authorization', `Bearer ${process.env.DICOM_AUTH_TOKEN}`);
+                    }
                     return defaultHeaders;
                 }
             });
