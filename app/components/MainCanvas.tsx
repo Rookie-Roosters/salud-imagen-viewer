@@ -48,8 +48,8 @@ export default function MainCanvas() {
                     '1.3.6.1.4.1.14519.5.2.1.1188.4001.866856253970500879015300047605',
                 SeriesInstanceUID:
                     '1.3.6.1.4.1.14519.5.2.1.1188.4001.913510847891003552926172580049',
-                wadoRsRoot: `https://healthcare.googleapis.com/v1/projects/saludimagen/locations/northamerica-northeast1/datasets/dicom_sample_v1/dicomStores/v1/dicomWeb`,
-                authToken: 'DICOM_TOKEN<<'
+                wadoRsRoot: process.env.DICOM_SERVER_URL || '',
+                authToken: process.env.DICOM_AUTH_TOKEN || ''
             });
 
             console.log('imageIds', imageIds);
