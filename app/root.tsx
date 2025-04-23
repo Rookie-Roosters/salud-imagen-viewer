@@ -21,8 +21,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body>
-        <Theme accentColor="blue" appearance="dark">
+      <body className="h-screen overflow-hidden">
+        <Theme accentColor="blue" appearance="dark" scaling="105%">
           {children}
           <ScrollRestoration />
           <Scripts />
