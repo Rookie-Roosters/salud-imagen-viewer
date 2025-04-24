@@ -52,7 +52,8 @@ const ImageCarousel = React.forwardRef<HTMLDivElement, ImageCarouselProps>(
                             <div
                                 className={cn(
                                     "h-24 w-24 p-px bg-black rounded-md overflow-hidden",
-                                    isSelected ? "border-2" : "border border-gray-700"
+                                    isSelected ? "border-2" : "border border-gray-700",
+                                    image.selected && !multiSelectMode ? "border-2 border-blue-500 ring-2 ring-blue-500 ring-opacity-50" : ""
                                 )}
                                 style={borderColor ? { borderColor } : {}}
                             >

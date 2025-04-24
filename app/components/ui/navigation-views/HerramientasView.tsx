@@ -62,10 +62,10 @@ export function HerramientasView() {
                             <span className="text-xs">Anotación</span>
                         </Button>
                         <Button
-                            variant={activeTool === "annotation" ? "default" : "outline"}
+                            variant={activeTool === "draw" ? "default" : "outline"}
                             size="sm"
                             className="flex flex-col gap-1 h-auto py-2"
-                            onClick={() => handleToolClick("annotation")}
+                            onClick={() => handleToolClick("draw")}
                         >
                             <Pen className="h-4 w-4" />
                             <span className="text-xs">Dibujar</span>

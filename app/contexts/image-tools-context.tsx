@@ -14,6 +14,7 @@ export type ImageToolType =
     | "circle"
     | "arrow"
     | "text"
+    | "draw"
     | "brightness"
     | "contrast"
     | "none"

@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react"
+import React, { useRef, useEffect, useState } from "react"
 import { cn } from "~/lib/utils"
 import { type Image } from "./image-carousel"
 import { type LayoutType } from "./navigation-bar"
@@ -8,10 +8,19 @@ import {
     type ReactZoomPanPinchRef
 } from 'react-zoom-pan-pinch'
 import { useImageTools } from "~/contexts/image-tools-context"
+import ImageDrawing from "./image-drawing"
+
+interface DrawPath {
+    id: string;
+    points: { x: number; y: number }[];
+    color: string;
+    width: number;
+}
 
 interface ImageLayoutProps extends React.HTMLAttributes<HTMLDivElement> {
     selectedImages: Image[]
     layoutType: LayoutType
+    onImageSelect?: (image: Image) => void
 }
 
 const layoutGridConfigs = {
@@ -22,7 +31,7 @@ const layoutGridConfigs = {
     "2x1": "grid-cols-2 grid-rows-1",
 }
 
-export function ImageLayout({ selectedImages, layoutType, className, ...props }: ImageLayoutProps) {
+export function ImageLayout({ selectedImages, layoutType, className, onImageSelect, ...props }: ImageLayoutProps) {
     // Default to single if no layout type specified
     const gridConfig = layoutGridConfigs[layoutType] || layoutGridConfigs.single
 
@@ -36,6 +45,13 @@ export function ImageLayout({ selectedImages, layoutType, className, ...props }:
         contrast,
         zoomLevel
     } = useImageTools()
+
+    // State for drawings
+    const [drawingPaths, setDrawingPaths] = useState<Record<string, DrawPath[]>>({})
+    const [currentScale, setCurrentScale] = useState(1)
+    const [currentOffset, setCurrentOffset] = useState({ x: 0, y: 0 })
+    const [containerSize, setContainerSize] = useState({ width: 0, height: 0 })
+    const containerRef = useRef<HTMLDivElement>(null)
 
     // Create refs for each cell in multi-layout mode
     const multiImageRefs = useRef<Record<number, ReactZoomPanPinchRef | null>>({})
@@ -64,11 +80,44 @@ export function ImageLayout({ selectedImages, layoutType, className, ...props }:
         }
     }
 
-    // Apply tool behaviors based on active tool
+    // Update container size on resize
     useEffect(() => {
-        // These behaviors are handled by the TransformWrapper component
-        // based on the current activeTool value
-    }, [activeTool])
+        if (!containerRef.current) return
+
+        const updateContainerSize = () => {
+            if (containerRef.current) {
+                const { width, height } = containerRef.current.getBoundingClientRect()
+                setContainerSize({ width, height })
+            }
+        }
+
+        // Initial size
+        updateContainerSize()
+
+        // Update on resize
+        window.addEventListener('resize', updateContainerSize)
+        return () => window.removeEventListener('resize', updateContainerSize)
+    }, [])
+
+    // Handle drawing completion
+    const handleDrawingComplete = (imageId: string, path: DrawPath) => {
+        setDrawingPaths(prev => {
+            const imagePaths = prev[imageId] || []
+            return {
+                ...prev,
+                [imageId]: [...imagePaths, path]
+            }
+        })
+    }
+
+    // Update transform state when scale changes
+    const handleTransformChange = (ref: ReactZoomPanPinchRef | null) => {
+        if (!ref) return
+
+        const { scale, positionX, positionY } = ref.state
+        setCurrentScale(scale)
+        setCurrentOffset({ x: positionX, y: positionY })
+    }
 
     // Container styles for maximizing available space
     const containerStyle = layoutType === "single"
@@ -87,6 +136,7 @@ export function ImageLayout({ selectedImages, layoutType, className, ...props }:
         >
             {cells.map(({ image, index }) => (
                 <div
+                    ref={index === 0 ? containerRef : undefined}
                     key={index}
                     className={cn(
                         "relative bg-black overflow-hidden",
@@ -95,6 +145,11 @@ export function ImageLayout({ selectedImages, layoutType, className, ...props }:
                     style={{
                         ...(image?.borderColor ? { borderColor: image.borderColor } : {}),
                         ...(layoutType === "single" ? { width: '100%', height: '100%' } : {})
+                    }}
+                    onClick={() => {
+                        if (image && onImageSelect && activeTool !== "draw") {
+                            onImageSelect(image)
+                        }
                     }}
                 >
                     {image && (
@@ -125,6 +180,7 @@ export function ImageLayout({ selectedImages, layoutType, className, ...props }:
                                             step: 0.2
                                         }}
                                         panning={{ disabled: activeTool !== "move" && activeTool !== "none" }}
+                                        onTransformed={(ref) => handleTransformChange(ref)}
                                     >
                                         <TransformComponent
                                             wrapperStyle={{ width: '100%', height: '100%' }}
@@ -148,6 +204,17 @@ export function ImageLayout({ selectedImages, layoutType, className, ...props }:
                                                 }}
                                             />
                                         </TransformComponent>
+                                        {activeTool === "draw" && containerSize.width > 0 && (
+                                            <ImageDrawing
+                                                containerWidth={containerSize.width}
+                                                containerHeight={containerSize.height}
+                                                scale={currentScale}
+                                                offsetX={currentOffset.x}
+                                                offsetY={currentOffset.y}
+                                                paths={drawingPaths[image.src] || []}
+                                                onDrawingComplete={(path) => handleDrawingComplete(image.src, path)}
+                                            />
+                                        )}
                                     </TransformWrapper>
                                 </div>
                             ) : (

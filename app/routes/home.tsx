@@ -62,7 +62,7 @@ export default function Page() {
   // Example study name - in a real application, this would come from a context or prop
   const studyName = "Thoracic-spine / Patella"
 
-  const sampleImages: Image[] = [
+  const [sampleImages, setSampleImages] = useState<Image[]>([
     {
       src: "/images/serie_1.png",
       alt: "Sample Image 1",
@@ -93,7 +93,7 @@ export default function Page() {
       seriesName: "Knee MRI",
       picturesCount: 16
     }
-  ]
+  ])
 
   // Custom sidebar trigger with collapse functionality
   const CustomSidebarTrigger = () => {
@@ -142,8 +142,14 @@ export default function Page() {
   // Handle single image selection
   const handleSingleImageSelect = (image: Image) => {
     setSelectedImage(image);
-    // In single mode, also update selectedImages with just this image
-    // This helps maintain a consistent state
+
+    // Update the sample images to mark the selected one
+    setSampleImages(prev => prev.map(img => ({
+      ...img,
+      selected: img.src === image.src
+    })));
+
+    // Just add the image to selectedImages without the selected flag
     setSelectedImages([{ ...image }]);
   }
 
@@ -210,6 +216,7 @@ export default function Page() {
                     selectedImages={selectedImages}
                     layoutType={layoutType}
                     className="w-full h-full"
+                    onImageSelect={handleSingleImageSelect}
                   />
                 </div>
               ) : layoutType !== "single" && selectedImages.length > 0 ? (
@@ -218,6 +225,7 @@ export default function Page() {
                     selectedImages={selectedImages}
                     layoutType={layoutType}
                     className="w-full h-full"
+                    onImageSelect={handleSingleImageSelect}
                   />
                 </div>
               ) : (
