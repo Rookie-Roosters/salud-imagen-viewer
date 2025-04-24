@@ -1,7 +1,13 @@
-import React from "react"
+import React, { useRef, useEffect } from "react"
 import { cn } from "~/lib/utils"
 import { type Image } from "./image-carousel"
 import { type LayoutType } from "./navigation-bar"
+import {
+    TransformWrapper,
+    TransformComponent,
+    type ReactZoomPanPinchRef
+} from 'react-zoom-pan-pinch'
+import { useImageTools } from "~/contexts/image-tools-context"
 
 interface ImageLayoutProps extends React.HTMLAttributes<HTMLDivElement> {
     selectedImages: Image[]
@@ -20,6 +26,20 @@ export function ImageLayout({ selectedImages, layoutType, className, ...props }:
     // Default to single if no layout type specified
     const gridConfig = layoutGridConfigs[layoutType] || layoutGridConfigs.single
 
+    const {
+        activeTool,
+        transformRef,
+        rotation,
+        horizontalFlip,
+        verticalFlip,
+        brightness,
+        contrast,
+        zoomLevel
+    } = useImageTools()
+
+    // Create refs for each cell in multi-layout mode
+    const multiImageRefs = useRef<Record<number, ReactZoomPanPinchRef | null>>({})
+
     // Calculate how many grid cells we need based on the layout
     const getCellCount = () => {
         switch (layoutType) {
@@ -37,10 +57,23 @@ export function ImageLayout({ selectedImages, layoutType, className, ...props }:
         return { image, index }
     })
 
+    // Helper to set ref for a specific index in multi-layout mode
+    const setMultiImageRef = (index: number) => (ref: ReactZoomPanPinchRef | null) => {
+        if (ref) {
+            multiImageRefs.current[index] = ref
+        }
+    }
+
+    // Apply tool behaviors based on active tool
+    useEffect(() => {
+        // These behaviors are handled by the TransformWrapper component
+        // based on the current activeTool value
+    }, [activeTool])
+
     return (
         <div
             className={cn(
-                "w-full h-full grid",
+                "w-full h-full grid gap-1",
                 gridConfig,
                 className
             )}
@@ -50,7 +83,7 @@ export function ImageLayout({ selectedImages, layoutType, className, ...props }:
                 <div
                     key={index}
                     className={cn(
-                        "relative flex items-center justify-center bg-black overflow-hidden",
+                        "relative flex flex-col items-center justify-center bg-black overflow-hidden",
                         image ? "border-2" : "border border-gray-800"
                     )}
                     style={image?.borderColor ? {
@@ -69,11 +102,92 @@ export function ImageLayout({ selectedImages, layoutType, className, ...props }:
                                     {image.picturesCount}
                                 </div>
                             )}
-                            <img
-                                src={image.src}
-                                alt={image.alt}
-                                className="h-full w-full rounded-md object-contain p-2"
-                            />
+
+                            {/* Use different TransformWrapper config based on single/multi layout */}
+                            {layoutType === "single" ? (
+                                <TransformWrapper
+                                    ref={transformRef}
+                                    initialScale={1}
+                                    minScale={0.2}
+                                    maxScale={8}
+                                    centerOnInit
+                                    limitToBounds
+                                    wheel={{
+                                        disabled: activeTool !== "zoom" && activeTool !== "none",
+                                        step: 0.2
+                                    }}
+                                    panning={{ disabled: activeTool !== "move" && activeTool !== "none" }}
+                                    pinch={{
+                                        disabled: activeTool !== "zoom" && activeTool !== "none",
+                                        step: 5
+                                    }}
+                                    doubleClick={{
+                                        disabled: activeTool !== "zoom" && activeTool !== "none",
+                                        step: 0.5
+                                    }}
+                                    zoomAnimation={{
+                                        size: 0.2,
+                                        animationTime: 0.2,
+                                        animationType: "easeOut"
+                                    }}
+                                >
+                                    <TransformComponent
+                                        wrapperClass="w-full h-full"
+                                        contentClass="h-full w-full"
+                                    >
+                                        <div
+                                            className="h-full w-full flex items-center justify-center"
+                                            style={{
+                                                transform: `
+                                                    rotate(${rotation}deg) 
+                                                    scaleX(${horizontalFlip ? -1 : 1}) 
+                                                    scaleY(${verticalFlip ? -1 : 1})
+                                                `,
+                                                filter: `
+                                                    brightness(${brightness / 50})
+                                                    contrast(${contrast / 50})
+                                                `
+                                            }}
+                                        >
+                                            <img
+                                                src={image.src}
+                                                alt={image.alt}
+                                                className="h-full w-full rounded-md object-contain max-h-full max-w-full"
+                                            />
+                                        </div>
+                                    </TransformComponent>
+                                </TransformWrapper>
+                            ) : (
+                                // Multi-image layout with simple zoom/pan
+                                <TransformWrapper
+                                    ref={setMultiImageRef(index)}
+                                    initialScale={1}
+                                    minScale={0.2}
+                                    maxScale={8}
+                                    centerOnInit
+                                    limitToBounds
+                                    wheel={{ step: 0.2 }}
+                                    doubleClick={{ step: 0.5 }}
+                                    zoomAnimation={{
+                                        size: 0.2,
+                                        animationTime: 0.2,
+                                        animationType: "easeOut"
+                                    }}
+                                >
+                                    <TransformComponent
+                                        wrapperClass="w-full h-full"
+                                        contentClass="h-full w-full"
+                                    >
+                                        <div className="h-full w-full flex items-center justify-center">
+                                            <img
+                                                src={image.src}
+                                                alt={image.alt}
+                                                className="h-full w-full rounded-md object-contain max-h-full max-w-full"
+                                            />
+                                        </div>
+                                    </TransformComponent>
+                                </TransformWrapper>
+                            )}
                         </>
                     )}
                 </div>

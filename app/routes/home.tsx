@@ -26,6 +26,7 @@ import { Button } from "~/components/ui/button"
 import { ImageLayout } from "~/components/ui/image-layout"
 import { useIsMobile } from "~/hooks/use-mobile"
 import { StudyTitle } from "~/components/ui/study-title"
+import { ImageToolsProvider } from "~/contexts/image-tools-context"
 //I want a nested collapsible sidebar. Each view must live on its own component. On mobile, the icon button navbar must work as a bottom navbar and the secondary navbar as a drawer. Use shadcn components
 
 // Set of border colors for selected images with more distinct colors
@@ -144,75 +145,64 @@ export default function Page() {
   }
 
   return (
-    <SidebarProvider>
-      {/* Desktop Navigation - Hidden on Mobile */}
-      <div className="hidden md:block">
-        <NavigationBar
-          isCollapsedProp={isCollapsed}
-          setIsCollapsedProp={setIsCollapsed}
-          layoutType={layoutType}
-          setLayoutType={setLayoutType}
-          isMultiSelectMode={isMultiSelectMode}
-          setIsMultiSelectMode={setIsMultiSelectMode}
-        />
-      </div>
+    <ImageToolsProvider>
+      <SidebarProvider>
+        {/* Desktop Navigation - Hidden on Mobile */}
+        <div className="hidden md:block">
+          <NavigationBar
+            isCollapsedProp={isCollapsed}
+            setIsCollapsedProp={setIsCollapsed}
+            layoutType={layoutType}
+            setLayoutType={setLayoutType}
+            isMultiSelectMode={isMultiSelectMode}
+            setIsMultiSelectMode={setIsMultiSelectMode}
+          />
+        </div>
 
-      {/* Mobile Navigation - Shown only on Mobile */}
-      <div className="md:hidden">
-        <MobileNavigation
-          layoutType={layoutType}
-          setLayoutType={setLayoutType}
-          isMultiSelectMode={isMultiSelectMode}
-          setIsMultiSelectMode={setIsMultiSelectMode}
-          studyName={studyName}
-        />
-      </div>
+        {/* Mobile Navigation - Shown only on Mobile */}
+        <div className="md:hidden">
+          <MobileNavigation
+            layoutType={layoutType}
+            setLayoutType={setLayoutType}
+            isMultiSelectMode={isMultiSelectMode}
+            setIsMultiSelectMode={setIsMultiSelectMode}
+            studyName={studyName}
+          />
+        </div>
 
-      <SidebarInset>
-        <div className="flex flex-col h-screen overflow-hidden">
-          <header className="flex h-16 shrink-0 items-center gap-2 z-10">
-            <div className="flex items-center gap-2 px-4">
-              {/* Only show sidebar trigger on desktop */}
-              <div className="hidden md:block">
-                <CustomSidebarTrigger />
+        <SidebarInset>
+          <div className="flex flex-col h-screen overflow-hidden">
+            <header className="flex h-16 shrink-0 items-center gap-2 z-10">
+              <div className="flex items-center gap-2 px-4">
+                {/* Only show sidebar trigger on desktop */}
+                <div className="hidden md:block">
+                  <CustomSidebarTrigger />
+                </div>
+
+                {/* Study title for desktop view */}
+                <div className="hidden md:flex items-center gap-2 border-l-2 pl-3">
+                  <StudyTitle title={studyName} className="text-base" />
+                </div>
+
+                {/* Breadcrumb - only shows Serie now */}
+                <Breadcrumb className="md:ml-2">
+                  <BreadcrumbList>
+
+                  </BreadcrumbList>
+                </Breadcrumb>
               </div>
+            </header>
 
-              {/* Study title for desktop view */}
-              <div className="hidden md:flex items-center gap-2 border-l-2 pl-3">
-                <StudyTitle title={studyName} className="text-base" />
-              </div>
-
-              {/* Breadcrumb - only shows Serie now */}
-              <Breadcrumb className="md:ml-2">
-                <BreadcrumbList>
-
-                </BreadcrumbList>
-              </Breadcrumb>
-            </div>
-          </header>
-
-          <main className="flex-1 flex items-center justify-center p-4 overflow-hidden bg-black">
-            {layoutType === "single" ? (
-              selectedImage ? (
-                <div className="relative w-full h-full flex flex-col items-center justify-center">
-                  {selectedImage.seriesName && (
-                    <div className="absolute top-4 left-4 bg-black/70 text-white px-3 py-1.5 rounded-md z-10">
-                      {selectedImage.seriesName}
-                    </div>
-                  )}
-                  <img
-                    src={selectedImage.src}
-                    alt={selectedImage.alt}
-                    className="max-h-full max-w-full object-contain"
+            <main className="flex-1 flex items-center justify-center p-4 overflow-hidden bg-black">
+              {layoutType === "single" && selectedImages.length > 0 ? (
+                <div className="relative w-full h-full">
+                  <ImageLayout
+                    selectedImages={selectedImages}
+                    layoutType={layoutType}
+                    className="w-full h-full"
                   />
                 </div>
-              ) : (
-                <div className="text-center text-gray-500">
-                  Select an image from the carousel below
-                </div>
-              )
-            ) : (
-              selectedImages.length > 0 ? (
+              ) : layoutType !== "single" && selectedImages.length > 0 ? (
                 <div className="relative w-full h-full">
                   <ImageLayout
                     selectedImages={selectedImages}
@@ -222,28 +212,28 @@ export default function Page() {
                 </div>
               ) : (
                 <div className="text-center text-gray-500">
-                  Select images from the carousel below to create a layout
+                  Select images from the carousel below
                 </div>
-              )
-            )}
-          </main>
+              )}
+            </main>
 
-          <div className="border-t border-gray-800 sticky bottom-0 z-20 shrink-0 bg-black pb-16 md:pb-0">
-            <ImageCarousel
-              images={sampleImages}
-              onImageSelect={layoutType === "single" ? handleSingleImageSelect : undefined}
-              multiSelectMode={layoutType !== "single"}
-              onMultiSelect={handleMultiSelectImage}
-              selectedImages={selectedImages}
-            />
+            <div className="border-t border-gray-800 sticky bottom-0 z-20 shrink-0 bg-black pb-16 md:pb-0">
+              <ImageCarousel
+                images={sampleImages}
+                onImageSelect={layoutType === "single" ? handleSingleImageSelect : undefined}
+                multiSelectMode={layoutType !== "single"}
+                onMultiSelect={handleMultiSelectImage}
+                selectedImages={selectedImages}
+              />
 
-            {/* Mobile Tools Toolbar - shown only on mobile devices */}
-            <div className="md:hidden">
-              <MobileToolsToolbar />
+              {/* Mobile Tools Toolbar - shown only on mobile devices */}
+              <div className="md:hidden">
+                <MobileToolsToolbar />
+              </div>
             </div>
           </div>
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
+        </SidebarInset>
+      </SidebarProvider>
+    </ImageToolsProvider>
   )
 }
