@@ -4,17 +4,43 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
+  --font-sans: "Myriad Pro", ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 html,
 body {
   @apply bg-white dark:bg-gray-950;
+  overscroll-behavior: none;
 
   @media (prefers-color-scheme: dark) {
     color-scheme: dark;
   }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+html.overflow-hidden body {
+  height: 100vh;
+  height: 100dvh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+html.overflow-hidden body .overflow-auto {
+  overflow: auto;
+  height: 100%;
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
 }
 
 @theme inline {
@@ -56,7 +82,7 @@ body {
 }
 
 :root {
-  --radius: 0.5rem;
+  --radius: 0.75rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.141 0.005 285.823);
   --card: oklch(1 0 0);
@@ -131,4 +157,9 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Custom utility classes */
+.font-myriad {
+  font-family: "Myriad Pro", ui-sans-serif, system-ui, sans-serif;
 }
