@@ -21,7 +21,7 @@ import { toast } from "sonner"
 
 export function CompartirView() {
     const [copySuccess, setCopySuccess] = useState(false);
-    const studyLink = "https://saludimagen.rookieroosters.com/study/123456";
+    const studyLink = "https://saludimagen.rookieroosters.com?patient=1343298";
 
     // Function to copy link to clipboard
     const copyToClipboard = async () => {

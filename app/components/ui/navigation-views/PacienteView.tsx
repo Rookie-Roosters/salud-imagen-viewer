@@ -18,7 +18,7 @@ export function PacienteView() {
                         </div>
                         <div className="grid grid-cols-3 items-center gap-4">
                             <Label htmlFor="id" className="text-right">ID</Label>
-                            <div className="col-span-2 font-medium">49555865</div>
+                            <div className="col-span-2 font-medium">1006289633</div>
                         </div>
                         <div className="grid grid-cols-3 items-center gap-4">
                             <Label htmlFor="access" className="text-right">Acceso</Label>
@@ -26,15 +26,23 @@ export function PacienteView() {
                         </div>
                         <div className="grid grid-cols-3 items-center gap-4">
                             <Label htmlFor="date" className="text-right">Fecha</Label>
-                            <div className="col-span-2 font-medium">2025-03-22</div>
+                            <div className="col-span-2 font-medium">sábado, 22 de marzo de 2025</div>
                         </div>
                         <div className="grid grid-cols-3 items-center gap-4">
                             <Label htmlFor="study" className="text-right">Estudio</Label>
-                            <div className="col-span-2 font-medium">Thoracic-spine / Patella</div>
+                            <div className="col-span-2 font-medium">COLUMNA DORSAL Y LUMBAR AP Y LATERAL</div>
                         </div>
                         <div className="grid grid-cols-3 items-center gap-4">
                             <Label htmlFor="dob" className="text-right">Fecha de nacimiento</Label>
-                            <div className="col-span-2 font-medium">2001-03-11</div>
+                            <div className="col-span-2 font-medium">11/Mar./2001</div>
+                        </div>
+                        <div className="grid grid-cols-3 items-center gap-4">
+                            <Label htmlFor="doctor" className="text-right">Médico solicitante</Label>
+                            <div className="col-span-2 font-medium">A QUIEN CORRESPONDA</div>
+                        </div>
+                        <div className="grid grid-cols-3 items-center gap-4">
+                            <Label htmlFor="branch" className="text-right">Sucursal</Label>
+                            <div className="col-span-2 font-medium">AGS UNIVERSIDAD</div>
                         </div>
                         <div className="grid grid-cols-3 items-center gap-4">
                             <Label htmlFor="series" className="text-right">Número de serie</Label>
@@ -50,15 +58,8 @@ export function PacienteView() {
                     <CardDescription>Estudios anteriores</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                            <div>Thoracic-spine</div>
-                            <div className="text-sm text-muted-foreground">2025-03-22</div>
-                        </div>
-                        <div className="flex items-center justify-between">
-                            <div>Patella</div>
-                            <div className="text-sm text-muted-foreground">2025-03-22</div>
-                        </div>
+                    <div className="text-sm text-muted-foreground">
+                        No se cuenta con estudios previos.
                     </div>
                 </CardContent>
             </Card>
