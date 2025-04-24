@@ -6,21 +6,45 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
+import { Toaster } from "sonner";
+import { useEffect } from "react";
 
 import type { Route } from "./+types/root";
 import "./styles/fonts.css";
 import "./styles/app.css";
 
 export const links: Route.LinksFunction = () => [
+  { rel: "manifest", href: "/manifest.json" },
+  { rel: "apple-touch-icon", href: "/icons/icon-192x192.png" },
   // Remove Google Fonts imports
 ];
 
+function registerServiceWorker() {
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then(registration => {
+          console.log('Service Worker registered with scope:', registration.scope);
+        })
+        .catch(error => {
+          console.error('Service Worker registration failed:', error);
+        });
+    });
+  }
+}
+
 export function Layout({ children }: { children: React.ReactNode }) {
+  useEffect(() => {
+    registerServiceWorker();
+  }, []);
+
   return (
     <html lang="en" className="dark overflow-hidden">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
         <Meta />
         <Links />
       </head>
@@ -34,7 +58,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  return (
+    <>
+      <Outlet />
+      <Toaster position="top-right" richColors />
+    </>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
