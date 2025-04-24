@@ -3,10 +3,13 @@ import { useEffect, useState } from "react";
 import {
     SquareUserRound,
     ClipboardPenLine,
+    PencilRuler,
     LayoutPanelLeft,
     Share,
     LifeBuoy,
-    X
+    X,
+    User,
+    UserCog
 } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { cn } from "~/lib/utils";
@@ -21,10 +24,13 @@ import {
     ComposicionView,
     PacienteView,
     ResultadosView,
+    HerramientasView,
     CompartirView,
     AccesibilidadView
 } from "~/components/ui/navigation-views";
 import { StudyTitle } from "~/components/ui/study-title";
+import { useUser } from "~/contexts/user-context";
+import { Badge } from "~/components/ui/badge";
 
 export type LayoutType = "single" | "2x2" | "3x3" | "1x2" | "2x1";
 
@@ -39,8 +45,14 @@ const navItems = [
         icon: ClipboardPenLine,
     },
     {
+        title: "Herramientas",
+        icon: PencilRuler,
+        doctorOnly: true, // Only doctors can access tools
+    },
+    {
         title: "Composición",
         icon: LayoutPanelLeft,
+        doctorOnly: true, // Only doctors can access layout
     },
     {
         title: "Compartir",
@@ -69,12 +81,28 @@ export function MobileNavigation({
     setIsMultiSelectMode,
     studyName = "Estudio RX Tórax", // Default value as fallback
 }: MobileNavigationProps) {
+    const { isPatient } = useUser();
     const [activeItem, setActiveItem] = useState(navItems[0]);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+    // Filter nav items based on user type
+    const filteredNavItems = navItems.filter(item => !isPatient || !item.doctorOnly);
+
+    // Reset active item if it's a patient-restricted item
+    useEffect(() => {
+        if (isPatient && activeItem?.doctorOnly) {
+            setActiveItem(filteredNavItems[0]);
+        }
+    }, [isPatient, activeItem]);
 
     // Render the appropriate view based on the active item
     const renderView = () => {
         if (!layoutType || !setLayoutType || !setIsMultiSelectMode) {
+            return null;
+        }
+
+        // If user is a patient and tries to access doctor-only views, return null
+        if (isPatient && activeItem.doctorOnly) {
             return null;
         }
 
@@ -83,6 +111,8 @@ export function MobileNavigation({
                 return <PacienteView />;
             case "Resultados":
                 return <ResultadosView />;
+            case "Herramientas":
+                return <HerramientasView />;
             case "Composición":
                 return (
                     <ComposicionView
@@ -115,7 +145,16 @@ export function MobileNavigation({
                     width="40"
                     height="40"
                 />
-                <StudyTitle title={studyName} className="text-sm max-w-[150px]" />
+                <div className="flex flex-col">
+                    <StudyTitle title={studyName} className="text-sm max-w-[150px]" />
+                    <Badge variant={isPatient ? "secondary" : "default"} className="mt-1 text-[0.65rem] py-0 px-1.5">
+                        {isPatient ? (
+                            <><User className="h-2 w-2 mr-0.5" /> Paciente</>
+                        ) : (
+                            <><UserCog className="h-2 w-2 mr-0.5" /> Doctor</>
+                        )}
+                    </Badge>
+                </div>
             </div>
 
             {/* Floating Accessibility Button (Top Right) */}
@@ -134,7 +173,7 @@ export function MobileNavigation({
             {/* Bottom Navigation Bar */}
             <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t bg-sidebar text-sidebar-foreground">
                 <div className="flex justify-around items-center h-16">
-                    {navItems.map((item) => (
+                    {filteredNavItems.map((item) => (
                         <Button
                             key={item.title}
                             variant="ghost"

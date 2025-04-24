@@ -10,6 +10,7 @@ import { Toaster } from "sonner";
 import { useEffect } from "react";
 
 import type { Route } from "./+types/root";
+import { UserProvider } from "./contexts/user-context";
 import "./styles/fonts.css";
 import "./styles/app.css";
 
@@ -59,10 +60,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
-    <>
+    <UserProvider>
       <Outlet />
       <Toaster position="top-right" richColors />
-    </>
+    </UserProvider>
   );
 }
 

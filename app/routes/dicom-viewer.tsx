@@ -1,4 +1,7 @@
 import React, { useState, Suspense, lazy } from 'react';
+import { useUser } from '~/contexts/user-context';
+import { Badge } from '~/components/ui/badge';
+import { User, UserCog } from 'lucide-react';
 
 // Sample DICOM Image URLs - Replace with actual DICOM images when available
 const sampleImageIds = [
@@ -20,15 +23,19 @@ const LoadingPlaceholder = ({ height }: { height: string | number }) => (
 );
 
 export default function DicomViewerPage() {
+    const { isPatient, isDoctor } = useUser();
     const [tools] = useState([
         'Pan',
         'Zoom',
         'WindowLevel',
         'StackScroll',
-        'Length',
-        'Angle',
-        'RectangleROI',
-        'EllipticalROI'
+        // Tools only available for doctors
+        ...(isPatient ? [] : [
+            'Length',
+            'Angle',
+            'RectangleROI',
+            'EllipticalROI'
+        ])
     ]);
 
     const handleImageRendered = (element: HTMLDivElement, imageId: string) => {
@@ -41,7 +48,16 @@ export default function DicomViewerPage() {
 
     return (
         <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-4">DICOM Viewer Example</h1>
+            <div className="flex items-center gap-2 mb-4">
+                <h1 className="text-2xl font-bold">DICOM Viewer</h1>
+                <Badge variant={isPatient ? "secondary" : "default"}>
+                    {isPatient ? (
+                        <><User className="h-3 w-3 mr-1" /> Paciente</>
+                    ) : (
+                        <><UserCog className="h-3 w-3 mr-1" /> Doctor</>
+                    )}
+                </Badge>
+            </div>
 
             <div className="mb-8">
                 <h2 className="text-xl font-semibold mb-2">Advanced Image Viewer</h2>

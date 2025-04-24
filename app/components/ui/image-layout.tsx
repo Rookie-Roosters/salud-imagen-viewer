@@ -70,25 +70,32 @@ export function ImageLayout({ selectedImages, layoutType, className, ...props }:
         // based on the current activeTool value
     }, [activeTool])
 
+    // Container styles for maximizing available space
+    const containerStyle = layoutType === "single"
+        ? { height: 'calc(100vh - 150px)', width: '100%' }
+        : {};
+
     return (
         <div
             className={cn(
-                "w-full h-full grid gap-1",
+                "grid gap-1 bg-black",
                 gridConfig,
                 className
             )}
+            style={containerStyle}
             {...props}
         >
             {cells.map(({ image, index }) => (
                 <div
                     key={index}
                     className={cn(
-                        "relative flex flex-col items-center justify-center bg-black overflow-hidden",
-                        image ? "border-2" : "border border-gray-800"
+                        "relative bg-black overflow-hidden",
+                        image ? "border border-gray-700" : "border border-gray-800",
                     )}
-                    style={image?.borderColor ? {
-                        borderColor: image.borderColor
-                    } : {}}
+                    style={{
+                        ...(image?.borderColor ? { borderColor: image.borderColor } : {}),
+                        ...(layoutType === "single" ? { width: '100%', height: '100%' } : {})
+                    }}
                 >
                     {image && (
                         <>
@@ -105,88 +112,69 @@ export function ImageLayout({ selectedImages, layoutType, className, ...props }:
 
                             {/* Use different TransformWrapper config based on single/multi layout */}
                             {layoutType === "single" ? (
-                                <TransformWrapper
-                                    ref={transformRef}
-                                    initialScale={1}
-                                    minScale={0.2}
-                                    maxScale={8}
-                                    centerOnInit
-                                    limitToBounds
-                                    wheel={{
-                                        disabled: activeTool !== "zoom" && activeTool !== "none",
-                                        step: 0.2
-                                    }}
-                                    panning={{ disabled: activeTool !== "move" && activeTool !== "none" }}
-                                    pinch={{
-                                        disabled: activeTool !== "zoom" && activeTool !== "none",
-                                        step: 5
-                                    }}
-                                    doubleClick={{
-                                        disabled: activeTool !== "zoom" && activeTool !== "none",
-                                        step: 0.5
-                                    }}
-                                    zoomAnimation={{
-                                        size: 0.2,
-                                        animationTime: 0.2,
-                                        animationType: "easeOut"
-                                    }}
-                                >
-                                    <TransformComponent
-                                        wrapperClass="w-full h-full"
-                                        contentClass="h-full w-full"
+                                // Full size viewer for single layout
+                                <div className="w-full h-full flex items-center justify-center">
+                                    <TransformWrapper
+                                        ref={transformRef}
+                                        initialScale={2.5}
+                                        minScale={0.1}
+                                        maxScale={10}
+                                        centerOnInit
+                                        wheel={{
+                                            disabled: activeTool !== "zoom" && activeTool !== "none",
+                                            step: 0.2
+                                        }}
+                                        panning={{ disabled: activeTool !== "move" && activeTool !== "none" }}
                                     >
-                                        <div
-                                            className="h-full w-full flex items-center justify-center"
-                                            style={{
-                                                transform: `
-                                                    rotate(${rotation}deg) 
-                                                    scaleX(${horizontalFlip ? -1 : 1}) 
-                                                    scaleY(${verticalFlip ? -1 : 1})
-                                                `,
-                                                filter: `
-                                                    brightness(${brightness / 50})
-                                                    contrast(${contrast / 50})
-                                                `
-                                            }}
+                                        <TransformComponent
+                                            wrapperStyle={{ width: '100%', height: '100%' }}
                                         >
                                             <img
                                                 src={image.src}
                                                 alt={image.alt}
-                                                className="h-full w-full rounded-md object-contain max-h-full max-w-full"
+                                                style={{
+                                                    maxWidth: '80vw',
+                                                    maxHeight: '80vh',
+                                                    objectFit: "contain",
+                                                    transform: `
+                                                        rotate(${rotation}deg) 
+                                                        scaleX(${horizontalFlip ? -1 : 1}) 
+                                                        scaleY(${verticalFlip ? -1 : 1})
+                                                    `,
+                                                    filter: `
+                                                        brightness(${brightness / 50})
+                                                        contrast(${contrast / 50})
+                                                    `
+                                                }}
                                             />
-                                        </div>
-                                    </TransformComponent>
-                                </TransformWrapper>
+                                        </TransformComponent>
+                                    </TransformWrapper>
+                                </div>
                             ) : (
-                                // Multi-image layout with simple zoom/pan
-                                <TransformWrapper
-                                    ref={setMultiImageRef(index)}
-                                    initialScale={1}
-                                    minScale={0.2}
-                                    maxScale={8}
-                                    centerOnInit
-                                    limitToBounds
-                                    wheel={{ step: 0.2 }}
-                                    doubleClick={{ step: 0.5 }}
-                                    zoomAnimation={{
-                                        size: 0.2,
-                                        animationTime: 0.2,
-                                        animationType: "easeOut"
-                                    }}
-                                >
-                                    <TransformComponent
-                                        wrapperClass="w-full h-full"
-                                        contentClass="h-full w-full"
+                                // Multi-image layout
+                                <div className="w-full h-full flex items-center justify-center">
+                                    <TransformWrapper
+                                        ref={setMultiImageRef(index)}
+                                        initialScale={1.8}
+                                        minScale={0.1}
+                                        maxScale={5}
+                                        centerOnInit
                                     >
-                                        <div className="h-full w-full flex items-center justify-center">
+                                        <TransformComponent
+                                            wrapperStyle={{ width: '100%', height: '100%' }}
+                                        >
                                             <img
                                                 src={image.src}
                                                 alt={image.alt}
-                                                className="h-full w-full rounded-md object-contain max-h-full max-w-full"
+                                                style={{
+                                                    maxWidth: '100%',
+                                                    maxHeight: '100%',
+                                                    objectFit: "contain"
+                                                }}
                                             />
-                                        </div>
-                                    </TransformComponent>
-                                </TransformWrapper>
+                                        </TransformComponent>
+                                    </TransformWrapper>
+                                </div>
                             )}
                         </>
                     )}

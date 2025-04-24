@@ -21,12 +21,14 @@ import { ImageCarousel, type Image } from "~/components/ui/image-carousel"
 import { NavigationBar, type LayoutType } from "~/components/ui/navigation-bar"
 import { MobileNavigation } from "~/components/ui/mobile-navigation"
 import { MobileToolsToolbar } from "~/components/ui/mobile-tools-toolbar"
-import { ArrowLeftToLine, ArrowRightToLine } from "lucide-react"
+import { Activity, ArrowLeftToLine, ArrowRightToLine, User, UserCog } from "lucide-react"
 import { Button } from "~/components/ui/button"
 import { ImageLayout } from "~/components/ui/image-layout"
 import { useIsMobile } from "~/hooks/use-mobile"
 import { StudyTitle } from "~/components/ui/study-title"
 import { ImageToolsProvider } from "~/contexts/image-tools-context"
+import { useUser } from "~/contexts/user-context"
+import { Badge } from "~/components/ui/badge"
 //I want a nested collapsible sidebar. Each view must live on its own component. On mobile, the icon button navbar must work as a bottom navbar and the secondary navbar as a drawer. Use shadcn components
 
 // Set of border colors for selected images with more distinct colors
@@ -55,6 +57,7 @@ export default function Page() {
   const [isMultiSelectMode, setIsMultiSelectMode] = useState(false)
   const [layoutType, setLayoutType] = useState<LayoutType>("single")
   const isMobile = useIsMobile()
+  const { isPatient, isDoctor } = useUser();
 
   // Example study name - in a real application, this would come from a context or prop
   const studyName = "Thoracic-spine / Patella"
@@ -182,6 +185,13 @@ export default function Page() {
                 {/* Study title for desktop view */}
                 <div className="hidden md:flex items-center gap-2 border-l-2 pl-3">
                   <StudyTitle title={studyName} className="text-base" />
+                  <Badge variant={isPatient ? "secondary" : "default"} className="ml-2">
+                    {isPatient ? (
+                      <><User className="h-3 w-3 mr-1" /> Paciente</>
+                    ) : (
+                      <><Activity className="h-3 w-3 mr-1" /> Doctor</>
+                    )}
+                  </Badge>
                 </div>
 
                 {/* Breadcrumb - only shows Serie now */}
@@ -212,7 +222,7 @@ export default function Page() {
                 </div>
               ) : (
                 <div className="text-center text-gray-500">
-                  Select images from the carousel below
+                  Selecciona una serie del estudio
                 </div>
               )}
             </main>
@@ -227,9 +237,11 @@ export default function Page() {
               />
 
               {/* Mobile Tools Toolbar - shown only on mobile devices */}
-              <div className="md:hidden">
-                <MobileToolsToolbar />
-              </div>
+              {!isPatient && (
+                <div className="md:hidden">
+                  <MobileToolsToolbar />
+                </div>
+              )}
             </div>
           </div>
         </SidebarInset>

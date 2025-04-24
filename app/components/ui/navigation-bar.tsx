@@ -26,6 +26,7 @@ import {
     CompartirView,
     AccesibilidadView
 } from "~/components/ui/navigation-views"
+import { useUser } from "~/contexts/user-context"
 
 export type LayoutType = "single" | "2x2" | "3x3" | "1x2" | "2x1"
 
@@ -49,12 +50,14 @@ const data = {
             url: "#",
             icon: PencilRuler,
             isActive: false,
+            doctorOnly: true, // Only doctors can access tools
         },
         {
             title: "Composición",
             url: "#",
             icon: LayoutPanelLeft,
             isActive: false,
+            doctorOnly: true, // Only doctors can access layout
         },
         {
             title: "Compartir",
@@ -87,6 +90,7 @@ export function NavigationBar({
     isMultiSelectMode?: boolean;
     setIsMultiSelectMode?: (mode: boolean) => void;
 }) {
+    const { isPatient } = useUser();
     // Note: I'm using state to show active item.
     // IRL you should use the url/router.
     const [activeItem, setActiveItem] = useState(data.navMain[0])
@@ -94,9 +98,19 @@ export function NavigationBar({
     const [isHovering, setIsHovering] = useState(false)
     const [_isCollapsed, _setIsCollapsed] = useState(false)
 
+    // Filter nav items based on user type
+    const filteredNavItems = data.navMain.filter(item => !isPatient || !item.doctorOnly);
+
     // Use either the prop values or the internal state
     const isCollapsed = isCollapsedProp !== undefined ? isCollapsedProp : _isCollapsed
     const setIsCollapsed = setIsCollapsedProp || _setIsCollapsed
+
+    // Reset active item if it's a patient-restricted item
+    useEffect(() => {
+        if (isPatient && activeItem?.doctorOnly) {
+            setActiveItem(filteredNavItems[0]);
+        }
+    }, [isPatient, activeItem]);
 
     useEffect(() => {
         if (isCollapsed && isHovering) {
@@ -108,6 +122,11 @@ export function NavigationBar({
 
     // Render the appropriate view based on the active item
     const renderView = () => {
+        // If user is a patient and tries to access doctor-only views, return null
+        if (isPatient && activeItem.doctorOnly) {
+            return null;
+        }
+
         switch (activeItem.title) {
             case "Paciente":
                 return <PacienteView />;
@@ -162,7 +181,7 @@ export function NavigationBar({
                     <SidebarGroup>
                         <SidebarGroupContent className="px-1.5 md:px-0">
                             <SidebarMenu>
-                                {data.navMain.map((item) => (
+                                {filteredNavItems.map((item) => (
                                     <SidebarMenuItem key={item.title}>
                                         <SidebarMenuButton
                                             tooltip={{
