@@ -6,8 +6,8 @@ const sampleImageIds = [
     //'wadouri:https://raw.githubusercontent.com/cornerstonejs/cornerstoneDICOMImageLoader/master/examples/MRImage.dcm',
 ];
 
-// Lazy load the DicomView component
-const DicomView = lazy(() => import('../components/ui/dicom-view'));
+// Lazy load the AdvancedImageViewer component
+const AdvancedImageViewer = lazy(() => import('../components/ui/advanced-image-viewer'));
 
 // Placeholder component while loading
 const LoadingPlaceholder = ({ height }: { height: string | number }) => (
@@ -44,9 +44,9 @@ export default function DicomViewerPage() {
             <h1 className="text-2xl font-bold mb-4">DICOM Viewer Example</h1>
 
             <div className="mb-8">
-                <h2 className="text-xl font-semibold mb-2">Single Image Viewer</h2>
+                <h2 className="text-xl font-semibold mb-2">Advanced Image Viewer</h2>
                 <Suspense fallback={<LoadingPlaceholder height="400px" />}>
-                    <DicomView
+                    <AdvancedImageViewer
                         imageIds={[sampleImageIds[0]]}
                         tools={tools}
                         height="400px"
@@ -59,7 +59,7 @@ export default function DicomViewerPage() {
             <div className="mb-8">
                 <h2 className="text-xl font-semibold mb-2">Multiple Image Stack</h2>
                 <Suspense fallback={<LoadingPlaceholder height="500px" />}>
-                    <DicomView
+                    <AdvancedImageViewer
                         imageIds={sampleImageIds}
                         tools={tools}
                         height="500px"
