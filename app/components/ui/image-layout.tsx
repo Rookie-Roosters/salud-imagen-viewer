@@ -50,7 +50,7 @@ export function ImageLayout({ selectedImages, layoutType, className, ...props }:
                 <div
                     key={index}
                     className={cn(
-                        "flex items-center justify-center bg-black overflow-hidden",
+                        "relative flex items-center justify-center bg-black overflow-hidden",
                         image ? "border-2" : "border border-gray-800"
                     )}
                     style={image?.borderColor ? {
@@ -58,11 +58,23 @@ export function ImageLayout({ selectedImages, layoutType, className, ...props }:
                     } : {}}
                 >
                     {image && (
-                        <img
-                            src={image.src}
-                            alt={image.alt}
-                            className="h-full w-full rounded-md object-contain p-2"
-                        />
+                        <>
+                            {image.seriesName && layoutType !== "single" && (
+                                <div className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded-md z-10">
+                                    {image.seriesName}
+                                </div>
+                            )}
+                            {image.picturesCount !== undefined && layoutType !== "single" && (
+                                <div className="absolute top-2 right-2 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded-md">
+                                    {image.picturesCount}
+                                </div>
+                            )}
+                            <img
+                                src={image.src}
+                                alt={image.alt}
+                                className="h-full w-full rounded-md object-contain p-2"
+                            />
+                        </>
                     )}
                 </div>
             ))}

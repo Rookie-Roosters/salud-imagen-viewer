@@ -7,6 +7,8 @@ export interface Image {
     alt: string
     selected?: boolean
     borderColor?: string
+    seriesName?: string
+    picturesCount?: number
 }
 
 interface ImageCarouselProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -59,6 +61,11 @@ const ImageCarousel = React.forwardRef<HTMLDivElement, ImageCarouselProps>(
                                     alt={image.alt}
                                     className="h-full w-full object-cover rounded-sm"
                                 />
+                                {image.picturesCount !== undefined && (
+                                    <div className="absolute top-0 right-0 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded-bl-md">
+                                        {image.picturesCount}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )

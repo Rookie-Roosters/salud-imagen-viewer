@@ -56,28 +56,38 @@ export default function Page() {
   const isMobile = useIsMobile()
 
   // Example study name - in a real application, this would come from a context or prop
-  const studyName = "Estudio RX Tórax"
+  const studyName = "Thoracic-spine / Patella"
 
   const sampleImages: Image[] = [
     {
       src: "/images/serie_1.png",
-      alt: "Sample Image 1"
+      alt: "Sample Image 1",
+      seriesName: "Chest X-Ray",
+      picturesCount: 12
     },
     {
       src: "/images/serie_2.png",
-      alt: "Sample Image 2"
+      alt: "Sample Image 2",
+      seriesName: "Abdominal CT",
+      picturesCount: 24
     },
     {
       src: "/images/serie_3.png",
-      alt: "Sample Image 3"
+      alt: "Sample Image 3",
+      seriesName: "Brain MRI",
+      picturesCount: 18
     },
     {
       src: "/images/serie_4.png",
-      alt: "Sample Image 4"
+      alt: "Sample Image 4",
+      seriesName: "Spine X-Ray",
+      picturesCount: 8
     },
     {
       src: "/images/serie_5.png",
-      alt: "Sample Image 5"
+      alt: "Sample Image 5",
+      seriesName: "Knee MRI",
+      picturesCount: 16
     }
   ]
 
@@ -184,7 +194,12 @@ export default function Page() {
           <main className="flex-1 flex items-center justify-center p-4 overflow-hidden bg-black">
             {layoutType === "single" ? (
               selectedImage ? (
-                <div className="relative w-full h-full flex items-center justify-center">
+                <div className="relative w-full h-full flex flex-col items-center justify-center">
+                  {selectedImage.seriesName && (
+                    <div className="absolute top-4 left-4 bg-black/70 text-white px-3 py-1.5 rounded-md z-10">
+                      {selectedImage.seriesName}
+                    </div>
+                  )}
                   <img
                     src={selectedImage.src}
                     alt={selectedImage.alt}
@@ -198,11 +213,13 @@ export default function Page() {
               )
             ) : (
               selectedImages.length > 0 ? (
-                <ImageLayout
-                  selectedImages={selectedImages}
-                  layoutType={layoutType}
-                  className="w-full h-full"
-                />
+                <div className="relative w-full h-full">
+                  <ImageLayout
+                    selectedImages={selectedImages}
+                    layoutType={layoutType}
+                    className="w-full h-full"
+                  />
+                </div>
               ) : (
                 <div className="text-center text-gray-500">
                   Select images from the carousel below to create a layout

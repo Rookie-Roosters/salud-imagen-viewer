@@ -14,19 +14,31 @@ export function PacienteView() {
                     <div className="grid gap-2">
                         <div className="grid grid-cols-3 items-center gap-4">
                             <Label htmlFor="name" className="text-right">Nombre</Label>
-                            <div className="col-span-2 font-medium">Juan Pérez Rodríguez</div>
+                            <div className="col-span-2 font-medium">MUÑOZ BARRIENTOS, ANTONIO</div>
                         </div>
                         <div className="grid grid-cols-3 items-center gap-4">
                             <Label htmlFor="id" className="text-right">ID</Label>
-                            <div className="col-span-2 font-medium">JPRZ-12345</div>
+                            <div className="col-span-2 font-medium">49555865</div>
+                        </div>
+                        <div className="grid grid-cols-3 items-center gap-4">
+                            <Label htmlFor="access" className="text-right">Acceso</Label>
+                            <div className="col-span-2 font-medium">AUN100628</div>
                         </div>
                         <div className="grid grid-cols-3 items-center gap-4">
                             <Label htmlFor="date" className="text-right">Fecha</Label>
-                            <div className="col-span-2 font-medium">15/06/2023</div>
+                            <div className="col-span-2 font-medium">2025-03-22</div>
                         </div>
                         <div className="grid grid-cols-3 items-center gap-4">
                             <Label htmlFor="study" className="text-right">Estudio</Label>
-                            <div className="col-span-2 font-medium">Resonancia Magnética - Cerebro</div>
+                            <div className="col-span-2 font-medium">Thoracic-spine / Patella</div>
+                        </div>
+                        <div className="grid grid-cols-3 items-center gap-4">
+                            <Label htmlFor="dob" className="text-right">Fecha de nacimiento</Label>
+                            <div className="col-span-2 font-medium">2001-03-11</div>
+                        </div>
+                        <div className="grid grid-cols-3 items-center gap-4">
+                            <Label htmlFor="series" className="text-right">Número de serie</Label>
+                            <div className="col-span-2 font-medium">9466, 9468</div>
                         </div>
                     </div>
                 </CardContent>
@@ -40,16 +52,12 @@ export function PacienteView() {
                 <CardContent>
                     <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                            <div>Radiografía - Tórax</div>
-                            <div className="text-sm text-muted-foreground">10/05/2023</div>
+                            <div>Thoracic-spine</div>
+                            <div className="text-sm text-muted-foreground">2025-03-22</div>
                         </div>
                         <div className="flex items-center justify-between">
-                            <div>Ecografía - Abdomen</div>
-                            <div className="text-sm text-muted-foreground">02/03/2023</div>
-                        </div>
-                        <div className="flex items-center justify-between">
-                            <div>Tomografía - Cerebro</div>
-                            <div className="text-sm text-muted-foreground">15/12/2022</div>
+                            <div>Patella</div>
+                            <div className="text-sm text-muted-foreground">2025-03-22</div>
                         </div>
                     </div>
                 </CardContent>
