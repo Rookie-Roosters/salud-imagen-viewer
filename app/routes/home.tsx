@@ -27,16 +27,21 @@ import { ImageLayout } from "~/components/ui/image-layout"
 
 // Set of border colors for selected images with more distinct colors
 const BORDER_COLORS = [
-  "#ff0000", // Red
-  "#00ff00", // Green
-  "#0000ff", // Blue
-  "#ff00ff", // Magenta
-  "#ffff00", // Yellow
-  "#00ffff", // Cyan
+  "#ff3030", // Bright Red
+  "#30c030", // Bright Green
+  "#3030ff", // Bright Blue
+  "#e040e0", // Magenta
+  "#e0e030", // Yellow
+  "#30e0e0", // Cyan
   "#ff8000", // Orange
-  "#8000ff", // Purple
-  "#0080ff", // Azure
-  "#ff0080", // Rose
+  "#8030ff", // Purple
+  "#00a0ff", // Light Blue
+  "#ff4080", // Rose
+  "#00c080", // Teal
+  "#c04000", // Rust
+  "#8000c0", // Indigo
+  "#c08000", // Amber
+  "#0080c0", // Cerulean
 ];
 
 export default function Page() {

@@ -113,10 +113,6 @@ export function NavigationBar({
 
     // Render the appropriate view based on the active item
     const renderView = () => {
-        if (!layoutType || !setLayoutType || !setIsMultiSelectMode) {
-            return null;
-        }
-
         switch (activeItem.title) {
             case "Paciente":
                 return <PacienteView />;
@@ -125,12 +121,15 @@ export function NavigationBar({
             case "Herramientas":
                 return <HerramientasView />;
             case "Composición":
-                return (
+                // Only pass props if they are defined
+                return layoutType && setLayoutType ? (
                     <ComposicionView
                         layoutType={layoutType}
                         setLayoutType={setLayoutType}
-                        setIsMultiSelectMode={setIsMultiSelectMode}
+                        setIsMultiSelectMode={setIsMultiSelectMode || (() => { })}
                     />
+                ) : (
+                    <div className="p-4">Layout configuration is not available.</div>
                 );
             case "Compartir":
                 return <CompartirView />;
@@ -178,7 +177,9 @@ export function NavigationBar({
                                             onMouseEnter={() => isCollapsed ? setActiveItem(item) : null}
                                             onClick={() => {
                                                 setActiveItem(item)
-                                                setIsCollapsed(false)
+                                                if (activeItem?.title === item.title) {
+                                                    setIsCollapsed(!isCollapsed)
+                                                }
                                             }}
                                             isActive={activeItem?.title === item.title}
                                             className="px-2.5 md:px-2"
