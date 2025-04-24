@@ -13,87 +13,187 @@ import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
+  useSidebar,
 } from "~/components/ui/sidebar"
 import { Topbar } from "~/components/ui/topbar"
 import { Bottombar } from "~/components/ui/bottombar"
-import { type Image } from "~/components/ui/image-carousel"
+import { ImageCarousel, type Image } from "~/components/ui/image-carousel"
+import { NavigationBar, type LayoutType } from "~/components/ui/navigation-bar"
+import { ArrowLeftToLine, ArrowRightToLine } from "lucide-react"
+import { Button } from "~/components/ui/button"
+import { ImageLayout } from "~/components/ui/image-layout"
+//I want a nested collapsible sidebar. Each view must live on its own component. On mobile, the icon button navbar must work as a bottom navbar and the secondary navbar as a drawer. Use shadcn components
+
+// Set of border colors for selected images with more distinct colors
+const BORDER_COLORS = [
+  "#ff0000", // Red
+  "#00ff00", // Green
+  "#0000ff", // Blue
+  "#ff00ff", // Magenta
+  "#ffff00", // Yellow
+  "#00ffff", // Cyan
+  "#ff8000", // Orange
+  "#8000ff", // Purple
+  "#0080ff", // Azure
+  "#ff0080", // Rose
+];
 
 export default function Page() {
   const [selectedImage, setSelectedImage] = useState<Image | null>(null)
+  const [selectedImages, setSelectedImages] = useState<Image[]>([])
+  const [isCollapsed, setIsCollapsed] = useState(false)
+  const [isMultiSelectMode, setIsMultiSelectMode] = useState(false)
+  const [layoutType, setLayoutType] = useState<LayoutType>("single")
 
-  // Sample images - replace with your actual images
   const sampleImages: Image[] = [
     {
-      id: "1",
-      src: "https://images.unsplash.com/photo-1576091160550-2173dba999ef",
+      src: "/images/serie_1.png",
       alt: "Sample Image 1"
     },
     {
-      id: "2",
-      src: "https://images.unsplash.com/photo-1563443806517-a0e11901ce7c",
+      src: "/images/serie_2.png",
       alt: "Sample Image 2"
     },
     {
-      id: "3",
-      src: "https://images.unsplash.com/photo-1625991422664-a922be79529f",
+      src: "/images/serie_3.png",
       alt: "Sample Image 3"
     },
     {
-      id: "4",
-      src: "https://images.unsplash.com/photo-1525183995014-bd94c0750cd5",
+      src: "/images/serie_4.png",
       alt: "Sample Image 4"
     },
     {
-      id: "5",
-      src: "https://images.unsplash.com/photo-1532186774580-a1af93abddec",
+      src: "/images/serie_5.png",
       alt: "Sample Image 5"
-    },
-    {
-      id: "6",
-      src: "https://images.unsplash.com/photo-1580121441575-41bcb5c6b47c",
-      alt: "Sample Image 6"
-    },
-    {
-      id: "7",
-      src: "https://images.unsplash.com/photo-1586348943529-beaae6c28db9",
-      alt: "Sample Image 7"
-    },
+    }
   ]
 
-  const handleAddImage = () => {
-    // Placeholder for adding a new image
-    console.log("Add new image clicked")
-    // You would typically show a file picker or form here
-    alert("Add image functionality would go here")
+  // Custom sidebar trigger with collapse functionality
+  const CustomSidebarTrigger = () => {
+    const { toggleSidebar, open, setOpen } = useSidebar()
+
+    const handleToggleCollapse = () => {
+      setIsCollapsed(!isCollapsed)
+      setOpen(!isCollapsed ? false : true)
+    }
+
+    return (
+      <Button
+        variant="ghost"
+        size="icon"
+        className="size-7"
+        onClick={handleToggleCollapse}
+        title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+      >
+        {isCollapsed ? <ArrowRightToLine className="size-4" /> : <ArrowLeftToLine className="size-4" />}
+        <span className="sr-only">{isCollapsed ? "Expand sidebar" : "Collapse sidebar"}</span>
+      </Button>
+    )
+  }
+
+  // Handle multi-select image functionality
+  const handleMultiSelectImage = (image: Image, index: number) => {
+    setSelectedImages(prev => {
+      // Check if the image is already selected
+      const existingIndex = prev.findIndex(img => img.src === image.src);
+
+      // If already selected, remove it
+      if (existingIndex >= 0) {
+        return prev.filter(img => img.src !== image.src);
+      }
+
+      // If not selected, add it with a color
+      const newImage = {
+        ...image,
+        borderColor: BORDER_COLORS[prev.length % BORDER_COLORS.length]
+      };
+
+      return [...prev, newImage];
+    });
+  }
+
+  // Handle single image selection
+  const handleSingleImageSelect = (image: Image) => {
+    setSelectedImage(image);
+    // In single mode, also update selectedImages with just this image
+    // This helps maintain a consistent state
+    setSelectedImages([{ ...image }]);
   }
 
   return (
-    <div className="flex h-full w-full flex-col">
-      <Topbar>
-        <h1 className="text-xl font-bold">Medical Image Viewer</h1>
-      </Topbar>
+    <SidebarProvider >
+      <NavigationBar
+        isCollapsedProp={isCollapsed}
+        setIsCollapsedProp={setIsCollapsed}
+        layoutType={layoutType}
+        setLayoutType={setLayoutType}
+        isMultiSelectMode={isMultiSelectMode}
+        setIsMultiSelectMode={setIsMultiSelectMode}
+      />
 
-      <main className="mt-14 mb-24 flex flex-1 items-center justify-center p-4">
-        {selectedImage ? (
-          <div className="relative aspect-square max-h-[80vh] max-w-[80vw]">
-            <img
-              src={selectedImage.src}
-              alt={selectedImage.alt}
-              className="h-full w-full rounded-lg object-contain"
+      <SidebarInset>
+        <div className="flex flex-col h-screen overflow-hidden">
+          <header className="flex h-16 shrink-0 items-center gap-2">
+            <div className="flex items-center gap-2 px-4">
+              <CustomSidebarTrigger />
+
+              <Breadcrumb className="border-l-2 pl-3">
+                <BreadcrumbList>
+                  <BreadcrumbItem className="hidden md:block">
+                    <BreadcrumbLink href="#">
+                      Estudio
+                    </BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator className="hidden md:block" />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>Serie</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </BreadcrumbList>
+              </Breadcrumb>
+            </div>
+          </header>
+
+          <main className="flex-1 flex items-center justify-center p-4 overflow-hidden bg-black">
+            {layoutType === "single" ? (
+              selectedImage ? (
+                <div className="relative w-full h-full flex items-center justify-center">
+                  <img
+                    src={selectedImage.src}
+                    alt={selectedImage.alt}
+                    className="max-h-full max-w-full object-contain"
+                  />
+                </div>
+              ) : (
+                <div className="text-center text-gray-500">
+                  Select an image from the carousel below
+                </div>
+              )
+            ) : (
+              selectedImages.length > 0 ? (
+                <ImageLayout
+                  selectedImages={selectedImages}
+                  layoutType={layoutType}
+                  className="w-full h-full"
+                />
+              ) : (
+                <div className="text-center text-gray-500">
+                  Select images from the carousel below to create a layout
+                </div>
+              )
+            )}
+          </main>
+
+          <div className="border-t border-gray-800 sticky bottom-0 z-10 shrink-0 bg-black">
+            <ImageCarousel
+              images={sampleImages}
+              onImageSelect={layoutType === "single" ? handleSingleImageSelect : undefined}
+              multiSelectMode={layoutType !== "single"}
+              onMultiSelect={handleMultiSelectImage}
+              selectedImages={selectedImages}
             />
           </div>
-        ) : (
-          <div className="text-center text-gray-500">
-            Select an image from the carousel below
-          </div>
-        )}
-      </main>
-
-      <Bottombar
-        images={sampleImages}
-        onImageSelect={setSelectedImage}
-        onAddClick={handleAddImage}
-      />
-    </div>
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
   )
 }

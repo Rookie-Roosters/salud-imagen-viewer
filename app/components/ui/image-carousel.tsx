@@ -1,60 +1,72 @@
 import React from "react"
 import { cn } from "~/lib/utils"
 import { Button } from "./button"
-import { Plus } from "lucide-react"
 
-interface Image {
-    id: string
+export interface Image {
     src: string
     alt: string
+    selected?: boolean
+    borderColor?: string
 }
 
 interface ImageCarouselProps extends React.HTMLAttributes<HTMLDivElement> {
     images: Image[]
     onImageSelect?: (image: Image) => void
-    onAddClick?: () => void
+    multiSelectMode?: boolean
+    onMultiSelect?: (image: Image, index: number) => void
+    selectedImages?: Image[]
 }
 
 const ImageCarousel = React.forwardRef<HTMLDivElement, ImageCarouselProps>(
-    ({ className, images, onImageSelect, onAddClick, ...props }, ref) => {
+    ({ className, images, onImageSelect, multiSelectMode = false, onMultiSelect, selectedImages = [], ...props }, ref) => {
         return (
             <div
                 ref={ref}
-                className={cn("relative flex justify-center overflow-x-auto gap-3 p-4 no-scrollbar", className)}
+                className={cn("flex items-center justify-center gap-4 overflow-x-auto py-4 no-scrollbar", className)}
                 {...props}
             >
-                <div className="flex gap-3">
-                    {images.map((image) => (
+                {images.map((image, index) => {
+                    // Find if this image is in selectedImages array
+                    const selectedImageMatch = multiSelectMode
+                        ? selectedImages.find(img => img.src === image.src)
+                        : null;
+
+                    const isSelected = !!selectedImageMatch;
+                    // Use the borderColor from the matched selected image
+                    const borderColor = selectedImageMatch?.borderColor;
+
+                    return (
                         <div
-                            key={image.id}
-                            className="flex-shrink-0 cursor-pointer"
-                            onClick={() => onImageSelect?.(image)}
+                            key={index}
+                            className="relative flex-shrink-0 cursor-pointer"
+                            onClick={() => {
+                                if (multiSelectMode && onMultiSelect) {
+                                    onMultiSelect(image, index);
+                                } else if (onImageSelect) {
+                                    onImageSelect(image);
+                                }
+                            }}
                         >
-                            <div className="relative aspect-square h-24 w-24 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800">
+                            <div
+                                className={cn(
+                                    "h-24 w-24 p-px bg-black rounded-md overflow-hidden",
+                                    isSelected ? "border-2" : "border border-gray-700"
+                                )}
+                                style={borderColor ? { borderColor } : {}}
+                            >
                                 <img
                                     src={image.src}
                                     alt={image.alt}
-                                    className="h-full w-full object-cover"
+                                    className="h-full w-full object-cover rounded-sm"
                                 />
                             </div>
                         </div>
-                    ))}
-                </div>
-                {onAddClick && (
-                    <div className="sticky right-4 flex-shrink-0">
-                        <Button
-                            variant="secondary"
-                            className="aspect-square h-24 w-24 rounded-lg border"
-                            onClick={onAddClick}
-                        >
-                            <Plus className="h-10 w-10" />
-                        </Button>
-                    </div>
-                )}
+                    )
+                })}
             </div>
         )
     }
 )
 ImageCarousel.displayName = "ImageCarousel"
 
-export { ImageCarousel, type Image } 
+export { ImageCarousel } 

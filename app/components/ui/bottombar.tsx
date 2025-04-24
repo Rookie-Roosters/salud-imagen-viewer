@@ -5,11 +5,10 @@ import { ImageCarousel, type Image } from "./image-carousel"
 interface BottombarProps extends React.HTMLAttributes<HTMLDivElement> {
     images: Image[]
     onImageSelect?: (image: Image) => void
-    onAddClick?: () => void
 }
 
 const Bottombar = React.forwardRef<HTMLDivElement, BottombarProps>(
-    ({ className, images, onImageSelect, onAddClick, children, ...props }, ref) => {
+    ({ className, images, onImageSelect, children, ...props }, ref) => {
         return (
             <div
                 ref={ref}
@@ -22,7 +21,6 @@ const Bottombar = React.forwardRef<HTMLDivElement, BottombarProps>(
                 <ImageCarousel
                     images={images}
                     onImageSelect={onImageSelect}
-                    onAddClick={onAddClick}
                 />
                 {children}
             </div>

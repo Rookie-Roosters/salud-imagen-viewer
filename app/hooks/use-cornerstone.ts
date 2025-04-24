@@ -6,6 +6,9 @@ let initialized = false;
 // Check if we're in a browser environment
 const isBrowser = typeof window !== "undefined";
 
+// Image cache for storing retrieved imageIds
+const imageCache = new Map<string, string[]>();
+
 /**
  * Custom hook for CornerstoneJS initialization and common functionalities
  * @returns {Object} Cornerstone utilities and state
@@ -57,7 +60,14 @@ export const useCornerstone = () => {
         // Initialize cornerstone tools
         await cornerstoneToolsModule.init();
 
-        await dicomImageLoaderModule.init();
+        await dicomImageLoaderModule.init({
+          beforeSend: (xhr: XMLHttpRequest) => {
+            const authToken = localStorage.getItem("auth_token");
+            if (authToken) {
+              xhr.setRequestHeader("Authorization", `Bearer ${authToken}`);
+            }
+          },
+        });
 
         // // Initialize DICOM Loader - using any to bypass type errors
         // const dicomLoader = dicomImageLoaderModule as any;
@@ -71,6 +81,11 @@ export const useCornerstone = () => {
         //     "wadors",
         //     dicomLoader.wadors.loadImage
         //   );
+
+        //   // Configure request headers with auth token whenever needed
+        //   dicomLoader.configure({
+
+        //   });
         // }
 
         // Register common tools
@@ -269,6 +284,102 @@ export const useCornerstone = () => {
     }
   };
 
+  /**
+   * Retrieve DICOM imageIds from a DICOM server with authentication
+   * @param {string} baseUrl - The base URL of the DICOM server
+   * @param {string} studyInstanceUID - Study instance UID
+   * @param {string} seriesInstanceUID - Series instance UID (optional)
+   * @param {string} authToken - Bearer authentication token (optional, will use localStorage if not provided)
+   * @returns {Promise<string[]>} - Array of image IDs that can be used with Cornerstone
+   */
+  const retrieveDICOMImageIds = async (
+    baseUrl: string,
+    studyInstanceUID: string,
+    seriesInstanceUID?: string,
+    authToken?: string
+  ): Promise<string[]> => {
+    if (!cornerstoneDICOMImageLoader) {
+      throw new Error("DICOM Image Loader is not initialized");
+    }
+
+    // Check cache first
+    const cacheKey = `${baseUrl}/${studyInstanceUID}${
+      seriesInstanceUID ? "/" + seriesInstanceUID : ""
+    }`;
+    if (imageCache.has(cacheKey)) {
+      return imageCache.get(cacheKey) || [];
+    }
+
+    try {
+      // Set auth token in localStorage to be used by the beforeSend hook
+      if (authToken) {
+        localStorage.setItem("auth_token", authToken);
+      }
+
+      // Construct the URL for the DICOM web service
+      let requestUrl = `${baseUrl}/studies/${studyInstanceUID}`;
+      if (seriesInstanceUID) {
+        requestUrl += `/series/${seriesInstanceUID}`;
+      }
+
+      // Add /instances suffix for DICOMweb
+      requestUrl += "/instances";
+
+      // Make the request to the DICOM server
+      const response = await fetch(requestUrl, {
+        headers: {
+          Accept: "application/dicom+json",
+          Authorization: `Bearer ${
+            authToken || localStorage.getItem("auth_token") || ""
+          }`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to retrieve DICOM instances: ${response.statusText}`
+        );
+      }
+
+      const instances = await response.json();
+
+      // Generate wadouri imageIds for each instance
+      const imageIds = instances
+        .map((instance: any) => {
+          const sopInstanceUID = instance["00080018"]?.Value?.[0]; // SOP Instance UID
+          if (!sopInstanceUID) {
+            console.warn("Instance missing SOP Instance UID", instance);
+            return null;
+          }
+
+          return `wadouri:${baseUrl}/studies/${studyInstanceUID}${
+            seriesInstanceUID ? `/series/${seriesInstanceUID}` : ""
+          }/instances/${sopInstanceUID}/frames/1`;
+        })
+        .filter(Boolean);
+
+      // Cache the results
+      imageCache.set(cacheKey, imageIds);
+
+      return imageIds;
+    } catch (error) {
+      console.error("Error retrieving DICOM images:", error);
+      throw error;
+    }
+  };
+
+  /**
+   * Clear the image cache
+   * @param {string} cacheKey - Optional specific cache key to clear, clears all if not provided
+   */
+  const clearImageCache = (cacheKey?: string) => {
+    if (cacheKey) {
+      imageCache.delete(cacheKey);
+    } else {
+      imageCache.clear();
+    }
+  };
+
   return {
     isInitialized,
     isLoading,
@@ -277,6 +388,8 @@ export const useCornerstone = () => {
     createViewport,
     createToolGroup,
     loadAndDisplayImage,
+    retrieveDICOMImageIds,
+    clearImageCache,
     cornerstone,
     cornerstoneTools,
     cornerstoneDICOMImageLoader,
