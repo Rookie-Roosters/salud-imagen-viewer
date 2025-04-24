@@ -52,9 +52,6 @@ export function AccesibilidadView() {
         setActiveSettings(Object.fromEntries(accessibilityClasses.map(className => [className, false])));
     };
 
-    // Button active state styling
-    const activeButtonClass = "border-2 border-primary bg-primary/25 ring-2 ring-primary ring-offset-2 text-primary-foreground";
-
     return (
         <div className="flex flex-col gap-4 p-4">
             <Button
@@ -67,186 +64,172 @@ export function AccesibilidadView() {
             </Button>
 
             <h2 className="text-lg font-semibold mb-2">Ajustes de contenido</h2>
-            <div className="grid grid-cols-2 gap-4">
-                <Button
-                    variant="outline"
+            <div className="grid grid-cols-2 gap-2">
+                <div
                     className={cn(
-                        "h-auto flex flex-col items-center justify-center gap-2 p-4",
-                        activeSettings['font-dyslexic'] && activeButtonClass
+                        "flex flex-col items-center border rounded-lg p-3 cursor-pointer",
+                        activeSettings['font-dyslexic'] ? "border-primary bg-primary/10" : "hover:border-primary/50"
                     )}
                     onClick={() => toggleSetting('font-dyslexic')}
                 >
-                    <div className="text-3xl font-bold">A<span className="text-sm">v</span></div>
-                    <span className="text-center text-xs">Fuente para dislexia</span>
-                </Button>
+                    <div className="text-3xl font-bold h-8 w-8 mb-1 flex items-center justify-center">A<span className="text-xs">v</span></div>
+                    <span className="text-sm">Fuente para dislexia</span>
+                </div>
 
-                <Button
-                    variant="outline"
+                <div
                     className={cn(
-                        "h-auto flex flex-col items-center justify-center gap-2 p-4",
-                        activeSettings['highlight-headings'] && activeButtonClass
+                        "flex flex-col items-center border rounded-lg p-3 cursor-pointer",
+                        activeSettings['highlight-headings'] ? "border-primary bg-primary/10" : "hover:border-primary/50"
                     )}
                     onClick={() => toggleSetting('highlight-headings')}
                 >
-                    <Heading2 className="h-8 w-8" />
-                    <span className="text-center text-xs">Destacar título</span>
-                </Button>
+                    <Heading2 className="h-8 w-8 mb-1" />
+                    <span className="text-sm">Destacar título</span>
+                </div>
 
-                <Button
-                    variant="outline"
+                <div
                     className={cn(
-                        "h-auto flex flex-col items-center justify-center gap-2 p-4",
-                        activeSettings['highlight-links'] && activeButtonClass
+                        "flex flex-col items-center border rounded-lg p-3 cursor-pointer",
+                        activeSettings['highlight-links'] ? "border-primary bg-primary/10" : "hover:border-primary/50"
                     )}
                     onClick={() => toggleSetting('highlight-links')}
                 >
-                    <Link className="h-8 w-8" />
-                    <span className="text-center text-xs">Destacar enlaces</span>
-                </Button>
+                    <Link className="h-8 w-8 mb-1" />
+                    <span className="text-sm">Destacar enlaces</span>
+                </div>
 
-                <Button
-                    variant="outline"
+                <div
                     className={cn(
-                        "h-auto flex flex-col items-center justify-center gap-2 p-4",
-                        activeSettings['letter-spacing'] && activeButtonClass
+                        "flex flex-col items-center border rounded-lg p-3 cursor-pointer",
+                        activeSettings['letter-spacing'] ? "border-primary bg-primary/10" : "hover:border-primary/50"
                     )}
                     onClick={() => toggleSetting('letter-spacing')}
                 >
-                    <div className="text-2xl font-bold">A<span className="text-xl">V</span></div>
-                    <span className="text-center text-xs">Espaciado entre letras</span>
-                </Button>
+                    <div className="h-8 w-8 mb-1 flex items-center justify-center text-2xl">A<span className="text-xl">V</span></div>
+                    <span className="text-sm">Espaciado entre letras</span>
+                </div>
 
-                <Button
-                    variant="outline"
+                <div
                     className={cn(
-                        "h-auto flex flex-col items-center justify-center gap-2 p-4",
-                        activeSettings['font-bold'] && activeButtonClass
+                        "flex flex-col items-center border rounded-lg p-3 cursor-pointer",
+                        activeSettings['font-bold'] ? "border-primary bg-primary/10" : "hover:border-primary/50"
                     )}
                     onClick={() => toggleSetting('font-bold')}
                 >
-                    <BoldIcon className="h-8 w-8" />
-                    <span className="text-center text-xs">Grosor de fuente</span>
-                </Button>
+                    <BoldIcon className="h-8 w-8 mb-1" />
+                    <span className="text-sm">Grosor de fuente</span>
+                </div>
             </div>
 
             <h2 className="text-lg font-semibold mb-2 mt-4">Ajustes de color</h2>
-            <div className="grid grid-cols-2 gap-4">
-                <Button
-                    variant="outline"
+            <div className="grid grid-cols-2 gap-2">
+                <div
                     className={cn(
-                        "h-auto flex flex-col items-center justify-center gap-2 p-4",
-                        activeSettings['dark-contrast'] && activeButtonClass
+                        "flex flex-col items-center border rounded-lg p-3 cursor-pointer",
+                        activeSettings['dark-contrast'] ? "border-primary bg-primary/10" : "hover:border-primary/50"
                     )}
                     onClick={() => toggleSetting('dark-contrast')}
                 >
-                    <div className="h-8 w-8 bg-black rounded-full" />
-                    <span className="text-center text-xs">Contraste oscuro</span>
-                </Button>
+                    <div className="h-8 w-8 mb-1 bg-black rounded-full flex items-center justify-center" />
+                    <span className="text-sm">Contraste oscuro</span>
+                </div>
 
-                <Button
-                    variant="outline"
+                <div
                     className={cn(
-                        "h-auto flex flex-col items-center justify-center gap-2 p-4",
-                        activeSettings['light-contrast'] && activeButtonClass
+                        "flex flex-col items-center border rounded-lg p-3 cursor-pointer",
+                        activeSettings['light-contrast'] ? "border-primary bg-primary/10" : "hover:border-primary/50"
                     )}
                     onClick={() => toggleSetting('light-contrast')}
                 >
-                    <div className="h-8 w-8 bg-white rounded-full border border-gray-300" />
-                    <span className="text-center text-xs">Contraste claro</span>
-                </Button>
+                    <div className="h-8 w-8 mb-1 bg-white rounded-full border border-gray-300 flex items-center justify-center" />
+                    <span className="text-sm">Contraste claro</span>
+                </div>
 
-                <Button
-                    variant="outline"
+                <div
                     className={cn(
-                        "h-auto flex flex-col items-center justify-center gap-2 p-4",
-                        activeSettings['high-contrast'] && activeButtonClass
+                        "flex flex-col items-center border rounded-lg p-3 cursor-pointer",
+                        activeSettings['high-contrast'] ? "border-primary bg-primary/10" : "hover:border-primary/50"
                     )}
                     onClick={() => toggleSetting('high-contrast')}
                 >
-                    <div className="h-8 w-8 rounded-full bg-gradient-to-r from-black to-white" />
-                    <span className="text-center text-xs">Alto contraste</span>
-                </Button>
+                    <div className="h-8 w-8 mb-1 rounded-full bg-gradient-to-r from-black to-white flex items-center justify-center" />
+                    <span className="text-sm">Alto contraste</span>
+                </div>
 
-                <Button
-                    variant="outline"
+                <div
                     className={cn(
-                        "h-auto flex flex-col items-center justify-center gap-2 p-4",
-                        activeSettings['high-saturation'] && activeButtonClass
+                        "flex flex-col items-center border rounded-lg p-3 cursor-pointer",
+                        activeSettings['high-saturation'] ? "border-primary bg-primary/10" : "hover:border-primary/50"
                     )}
                     onClick={() => toggleSetting('high-saturation')}
                 >
-                    <div className="h-8 w-8 rounded-full bg-black overflow-hidden flex items-center justify-center">
+                    <div className="h-8 w-8 mb-1 rounded-full bg-black overflow-hidden flex items-center justify-center">
                         <div className="h-4 w-4 rounded-full bg-black border-2 border-white"></div>
                     </div>
-                    <span className="text-center text-xs">Alta saturación</span>
-                </Button>
+                    <span className="text-sm">Alta saturación</span>
+                </div>
 
-                <Button
-                    variant="outline"
+                <div
                     className={cn(
-                        "h-auto flex flex-col items-center justify-center gap-2 p-4",
-                        activeSettings['low-saturation'] && activeButtonClass
+                        "flex flex-col items-center border rounded-lg p-3 cursor-pointer",
+                        activeSettings['low-saturation'] ? "border-primary bg-primary/10" : "hover:border-primary/50"
                     )}
                     onClick={() => toggleSetting('low-saturation')}
                 >
-                    <div className="h-8 w-8 rounded-full bg-white overflow-hidden flex items-center justify-center">
+                    <div className="h-8 w-8 mb-1 rounded-full bg-white overflow-hidden flex items-center justify-center">
                         <div className="h-4 w-4 rounded-full bg-white border-2 border-black"></div>
                     </div>
-                    <span className="text-center text-xs">Baja saturación</span>
-                </Button>
+                    <span className="text-sm">Baja saturación</span>
+                </div>
 
-                <Button
-                    variant="outline"
+                <div
                     className={cn(
-                        "h-auto flex flex-col items-center justify-center gap-2 p-4",
-                        activeSettings['monochrome'] && activeButtonClass
+                        "flex flex-col items-center border rounded-lg p-3 cursor-pointer",
+                        activeSettings['monochrome'] ? "border-primary bg-primary/10" : "hover:border-primary/50"
                     )}
                     onClick={() => toggleSetting('monochrome')}
                 >
-                    <div className="h-8 w-8 rounded-full overflow-hidden">
+                    <div className="h-8 w-8 mb-1 rounded-full overflow-hidden flex items-center justify-center">
                         <div className="h-full w-full bg-gradient-to-br from-gray-900 to-gray-100"></div>
                     </div>
-                    <span className="text-center text-xs">Monocromo</span>
-                </Button>
+                    <span className="text-sm">Monocromo</span>
+                </div>
             </div>
 
             <h2 className="text-lg font-semibold mb-2 mt-4">Herramientas</h2>
-            <div className="grid grid-cols-2 gap-4">
-                <Button
-                    variant="outline"
+            <div className="grid grid-cols-2 gap-2">
+                <div
                     className={cn(
-                        "h-auto flex flex-col items-center justify-center gap-2 p-4",
-                        activeSettings['reading-guide'] && activeButtonClass
+                        "flex flex-col items-center border rounded-lg p-3 cursor-pointer",
+                        activeSettings['reading-guide'] ? "border-primary bg-primary/10" : "hover:border-primary/50"
                     )}
                     onClick={() => toggleSetting('reading-guide')}
                 >
-                    <Book className="h-8 w-8" />
-                    <span className="text-center text-xs">Guía de lectura</span>
-                </Button>
+                    <Book className="h-8 w-8 mb-1" />
+                    <span className="text-sm">Guía de lectura</span>
+                </div>
 
-                <Button
-                    variant="outline"
+                <div
                     className={cn(
-                        "h-auto flex flex-col items-center justify-center gap-2 p-4",
-                        activeSettings['no-animations'] && activeButtonClass
+                        "flex flex-col items-center border rounded-lg p-3 cursor-pointer",
+                        activeSettings['no-animations'] ? "border-primary bg-primary/10" : "hover:border-primary/50"
                     )}
                     onClick={() => toggleSetting('no-animations')}
                 >
-                    <Pause className="h-8 w-8" />
-                    <span className="text-center text-xs">Detener animaciones</span>
-                </Button>
+                    <Pause className="h-8 w-8 mb-1" />
+                    <span className="text-sm">Detener animaciones</span>
+                </div>
 
-                <Button
-                    variant="outline"
+                <div
                     className={cn(
-                        "h-auto flex flex-col items-center justify-center gap-2 p-4",
-                        activeSettings['large-cursor'] && activeButtonClass
+                        "flex flex-col items-center border rounded-lg p-3 cursor-pointer",
+                        activeSettings['large-cursor'] ? "border-primary bg-primary/10" : "hover:border-primary/50"
                     )}
                     onClick={() => toggleSetting('large-cursor')}
                 >
-                    <MousePointer className="h-8 w-8" />
-                    <span className="text-center text-xs">Cursor grande</span>
-                </Button>
+                    <MousePointer className="h-8 w-8 mb-1" />
+                    <span className="text-sm">Cursor grande</span>
+                </div>
             </div>
         </div>
     );

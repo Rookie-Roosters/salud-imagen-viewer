@@ -145,6 +145,7 @@ export function NavigationBar({
         <Sidebar
             collapsible="icon"
             className="overflow-hidden [&>[data-sidebar=sidebar]]:flex-row"
+            onMouseLeave={() => setIsHovering(false)}
             {...props}
         >
             {/* This is the first sidebar */}
@@ -154,7 +155,7 @@ export function NavigationBar({
                 collapsible="none"
                 className="!w-[calc(var(--sidebar-width-icon)_+_1px)] border-r"
                 onMouseEnter={() => setIsHovering(true)}
-                onMouseLeave={() => setIsHovering(false)}
+
             >
                 <SidebarHeader>
                     <SidebarMenu>
@@ -174,6 +175,7 @@ export function NavigationBar({
                                                 children: item.title,
                                                 hidden: false,
                                             }}
+                                            onMouseEnter={() => isCollapsed ? setActiveItem(item) : null}
                                             onClick={() => {
                                                 setActiveItem(item)
                                                 setIsCollapsed(false)

@@ -19,6 +19,7 @@ import { Topbar } from "~/components/ui/topbar"
 import { Bottombar } from "~/components/ui/bottombar"
 import { ImageCarousel, type Image } from "~/components/ui/image-carousel"
 import { NavigationBar, type LayoutType } from "~/components/ui/navigation-bar"
+import { MobileNavigation } from "~/components/ui/mobile-navigation"
 import { ArrowLeftToLine, ArrowRightToLine } from "lucide-react"
 import { Button } from "~/components/ui/button"
 import { ImageLayout } from "~/components/ui/image-layout"
@@ -121,23 +122,39 @@ export default function Page() {
   }
 
   return (
-    <SidebarProvider >
-      <NavigationBar
-        isCollapsedProp={isCollapsed}
-        setIsCollapsedProp={setIsCollapsed}
-        layoutType={layoutType}
-        setLayoutType={setLayoutType}
-        isMultiSelectMode={isMultiSelectMode}
-        setIsMultiSelectMode={setIsMultiSelectMode}
-      />
+    <SidebarProvider>
+      {/* Desktop Navigation - Hidden on Mobile */}
+      <div className="hidden md:block">
+        <NavigationBar
+          isCollapsedProp={isCollapsed}
+          setIsCollapsedProp={setIsCollapsed}
+          layoutType={layoutType}
+          setLayoutType={setLayoutType}
+          isMultiSelectMode={isMultiSelectMode}
+          setIsMultiSelectMode={setIsMultiSelectMode}
+        />
+      </div>
+
+      {/* Mobile Navigation - Shown only on Mobile */}
+      <div className="md:hidden">
+        <MobileNavigation
+          layoutType={layoutType}
+          setLayoutType={setLayoutType}
+          isMultiSelectMode={isMultiSelectMode}
+          setIsMultiSelectMode={setIsMultiSelectMode}
+        />
+      </div>
 
       <SidebarInset>
         <div className="flex flex-col h-screen overflow-hidden">
-          <header className="flex h-16 shrink-0 items-center gap-2">
+          <header className="flex h-16 shrink-0 items-center gap-2 z-10">
             <div className="flex items-center gap-2 px-4">
-              <CustomSidebarTrigger />
+              {/* Only show sidebar trigger on desktop */}
+              <div className="hidden md:block">
+                <CustomSidebarTrigger />
+              </div>
 
-              <Breadcrumb className="border-l-2 pl-3">
+              <Breadcrumb className="md:border-l-2 md:pl-3">
                 <BreadcrumbList>
                   <BreadcrumbItem className="hidden md:block">
                     <BreadcrumbLink href="#">
@@ -183,7 +200,7 @@ export default function Page() {
             )}
           </main>
 
-          <div className="border-t border-gray-800 sticky bottom-0 z-10 shrink-0 bg-black">
+          <div className="border-t border-gray-800 sticky bottom-0 z-20 shrink-0 bg-black pb-16 md:pb-0">
             <ImageCarousel
               images={sampleImages}
               onImageSelect={layoutType === "single" ? handleSingleImageSelect : undefined}
