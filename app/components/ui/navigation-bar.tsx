@@ -31,11 +31,6 @@ export type LayoutType = "single" | "2x2" | "3x3" | "1x2" | "2x1"
 
 // This is sample data
 const data = {
-    user: {
-        name: "shadcn",
-        email: "m@example.com",
-        avatar: "/avatars/shadcn.jpg",
-    },
     navMain: [
         {
             title: "Paciente",

@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import {
     SquareUserRound,
     ClipboardPenLine,
-    PencilRuler,
     LayoutPanelLeft,
     Share,
     LifeBuoy,
@@ -22,10 +21,10 @@ import {
     ComposicionView,
     PacienteView,
     ResultadosView,
-    HerramientasView,
     CompartirView,
     AccesibilidadView
 } from "~/components/ui/navigation-views";
+import { StudyTitle } from "~/components/ui/study-title";
 
 export type LayoutType = "single" | "2x2" | "3x3" | "1x2" | "2x1";
 
@@ -40,10 +39,6 @@ const navItems = [
         icon: ClipboardPenLine,
     },
     {
-        title: "Herramientas",
-        icon: PencilRuler,
-    },
-    {
         title: "Composición",
         icon: LayoutPanelLeft,
     },
@@ -51,17 +46,20 @@ const navItems = [
         title: "Compartir",
         icon: Share,
     },
-    {
-        title: "Accesibilidad",
-        icon: LifeBuoy,
-    },
 ];
+
+// Accessibility item (moved to floating button)
+const accessibilityItem = {
+    title: "Accesibilidad",
+    icon: LifeBuoy,
+};
 
 interface MobileNavigationProps {
     layoutType?: LayoutType;
     setLayoutType?: (layout: LayoutType) => void;
     isMultiSelectMode?: boolean;
     setIsMultiSelectMode?: (mode: boolean) => void;
+    studyName?: string;
 }
 
 export function MobileNavigation({
@@ -69,6 +67,7 @@ export function MobileNavigation({
     setLayoutType,
     isMultiSelectMode,
     setIsMultiSelectMode,
+    studyName = "Estudio RX Tórax", // Default value as fallback
 }: MobileNavigationProps) {
     const [activeItem, setActiveItem] = useState(navItems[0]);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -84,8 +83,6 @@ export function MobileNavigation({
                 return <PacienteView />;
             case "Resultados":
                 return <ResultadosView />;
-            case "Herramientas":
-                return <HerramientasView />;
             case "Composición":
                 return (
                     <ComposicionView
@@ -103,25 +100,46 @@ export function MobileNavigation({
         }
     };
 
-    const handleNavItemClick = (item: typeof navItems[0]) => {
+    const handleNavItemClick = (item: typeof navItems[0] | typeof accessibilityItem) => {
         setActiveItem(item);
         setIsDrawerOpen(true);
     };
 
     return (
         <>
+            {/* Logo and Study Name at Top Left */}
+            <div className="md:hidden fixed top-4 left-4 z-50 flex items-center gap-2">
+                <img
+                    src="/SaludImagen-Iso.svg"
+                    alt="SaludImagen Logo"
+                    width="40"
+                    height="40"
+                />
+                <StudyTitle title={studyName} className="text-sm max-w-[150px]" />
+            </div>
+
+            {/* Floating Accessibility Button (Top Right) */}
+            <div className="md:hidden fixed top-4 right-4 z-50">
+                <Button
+                    variant="outline"
+                    size="icon"
+                    className="rounded-full bg-background shadow-md border"
+                    onClick={() => handleNavItemClick(accessibilityItem)}
+                    aria-label="Accesibilidad"
+                >
+                    <accessibilityItem.icon className="h-5 w-5" />
+                </Button>
+            </div>
+
             {/* Bottom Navigation Bar */}
-            <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t bg-background shadow-sm">
+            <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t bg-sidebar text-sidebar-foreground">
                 <div className="flex justify-around items-center h-16">
                     {navItems.map((item) => (
                         <Button
                             key={item.title}
                             variant="ghost"
                             size="sm"
-                            className={cn(
-                                "flex flex-col items-center justify-center h-full rounded-none px-1",
-                                activeItem.title === item.title ? "text-primary" : "text-muted-foreground"
-                            )}
+                            className="flex flex-col items-center justify-center h-full rounded-none px-1 text-muted-foreground"
                             onClick={() => handleNavItemClick(item)}
                         >
                             <item.icon className="h-5 w-5 mb-1" />

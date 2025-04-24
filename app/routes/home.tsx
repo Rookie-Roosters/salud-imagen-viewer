@@ -20,9 +20,12 @@ import { Bottombar } from "~/components/ui/bottombar"
 import { ImageCarousel, type Image } from "~/components/ui/image-carousel"
 import { NavigationBar, type LayoutType } from "~/components/ui/navigation-bar"
 import { MobileNavigation } from "~/components/ui/mobile-navigation"
+import { MobileToolsToolbar } from "~/components/ui/mobile-tools-toolbar"
 import { ArrowLeftToLine, ArrowRightToLine } from "lucide-react"
 import { Button } from "~/components/ui/button"
 import { ImageLayout } from "~/components/ui/image-layout"
+import { useIsMobile } from "~/hooks/use-mobile"
+import { StudyTitle } from "~/components/ui/study-title"
 //I want a nested collapsible sidebar. Each view must live on its own component. On mobile, the icon button navbar must work as a bottom navbar and the secondary navbar as a drawer. Use shadcn components
 
 // Set of border colors for selected images with more distinct colors
@@ -50,6 +53,10 @@ export default function Page() {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [isMultiSelectMode, setIsMultiSelectMode] = useState(false)
   const [layoutType, setLayoutType] = useState<LayoutType>("single")
+  const isMobile = useIsMobile()
+
+  // Example study name - in a real application, this would come from a context or prop
+  const studyName = "Estudio RX Tórax"
 
   const sampleImages: Image[] = [
     {
@@ -147,6 +154,7 @@ export default function Page() {
           setLayoutType={setLayoutType}
           isMultiSelectMode={isMultiSelectMode}
           setIsMultiSelectMode={setIsMultiSelectMode}
+          studyName={studyName}
         />
       </div>
 
@@ -159,17 +167,15 @@ export default function Page() {
                 <CustomSidebarTrigger />
               </div>
 
-              <Breadcrumb className="md:border-l-2 md:pl-3">
+              {/* Study title for desktop view */}
+              <div className="hidden md:flex items-center gap-2 border-l-2 pl-3">
+                <StudyTitle title={studyName} className="text-base" />
+              </div>
+
+              {/* Breadcrumb - only shows Serie now */}
+              <Breadcrumb className="md:ml-2">
                 <BreadcrumbList>
-                  <BreadcrumbItem className="hidden md:block">
-                    <BreadcrumbLink href="#">
-                      Estudio
-                    </BreadcrumbLink>
-                  </BreadcrumbItem>
-                  <BreadcrumbSeparator className="hidden md:block" />
-                  <BreadcrumbItem>
-                    <BreadcrumbPage>Serie</BreadcrumbPage>
-                  </BreadcrumbItem>
+
                 </BreadcrumbList>
               </Breadcrumb>
             </div>
@@ -213,6 +219,11 @@ export default function Page() {
               onMultiSelect={handleMultiSelectImage}
               selectedImages={selectedImages}
             />
+
+            {/* Mobile Tools Toolbar - shown only on mobile devices */}
+            <div className="md:hidden">
+              <MobileToolsToolbar />
+            </div>
           </div>
         </div>
       </SidebarInset>
