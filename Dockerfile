@@ -10,7 +10,7 @@ FROM node:20-alpine AS production-dependencies-env
 RUN npm install -g pnpm
 COPY ./package.json pnpm-lock.yaml /app/
 WORKDIR /app
-RUN pnpm install --omit=dev
+RUN pnpm install
 
 FROM node:20-alpine AS build-env
 # Install PNPM
