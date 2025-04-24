@@ -1,5 +1,5 @@
 import * as React from "react"
-import { ArchiveX, Command, File, Inbox, Send, SquareUserRound, Trash2, ChevronLeft, ChevronRight, ClipboardPenLine, PencilRuler, LayoutPanelLeft, Share, Grid2X2, Grid3X3 } from "lucide-react"
+import { ArchiveX, Command, File, Inbox, Send, SquareUserRound, Trash2, ChevronLeft, ChevronRight, ClipboardPenLine, PencilRuler, LayoutPanelLeft, Share, Grid2X2, Grid3X3, LifeBuoy } from "lucide-react"
 import { Label } from "~/components/ui/label"
 import {
     Sidebar,
@@ -23,7 +23,8 @@ import {
     PacienteView,
     ResultadosView,
     HerramientasView,
-    CompartirView
+    CompartirView,
+    AccesibilidadView
 } from "~/components/ui/navigation-views"
 
 export type LayoutType = "single" | "2x2" | "3x3" | "1x2" | "2x1"
@@ -64,6 +65,12 @@ const data = {
             title: "Compartir",
             url: "#",
             icon: Share,
+            isActive: false,
+        },
+        {
+            title: "Accesibilidad",
+            url: "#",
+            icon: LifeBuoy,
             isActive: false,
         },
     ],
@@ -127,6 +134,8 @@ export function NavigationBar({
                 );
             case "Compartir":
                 return <CompartirView />;
+            case "Accesibilidad":
+                return <AccesibilidadView />;
             default:
                 return null;
         }
@@ -136,8 +145,6 @@ export function NavigationBar({
         <Sidebar
             collapsible="icon"
             className="overflow-hidden [&>[data-sidebar=sidebar]]:flex-row"
-            onMouseEnter={() => setIsHovering(true)}
-            onMouseLeave={() => setIsHovering(false)}
             {...props}
         >
             {/* This is the first sidebar */}
@@ -146,6 +153,8 @@ export function NavigationBar({
             <Sidebar
                 collapsible="none"
                 className="!w-[calc(var(--sidebar-width-icon)_+_1px)] border-r"
+                onMouseEnter={() => setIsHovering(true)}
+                onMouseLeave={() => setIsHovering(false)}
             >
                 <SidebarHeader>
                     <SidebarMenu>
@@ -167,7 +176,6 @@ export function NavigationBar({
                                             }}
                                             onClick={() => {
                                                 setActiveItem(item)
-                                                setOpen(true)
                                                 setIsCollapsed(false)
                                             }}
                                             isActive={activeItem?.title === item.title}
@@ -184,21 +192,25 @@ export function NavigationBar({
                 </SidebarContent>
             </Sidebar>
 
-
-            <Sidebar collapsible="none" className="hidden flex-1 md:flex">
-                <SidebarHeader className="gap-3.5 border-b p-4">
-                    <div className="font-medium text-lg">{activeItem?.title}</div>
-                </SidebarHeader>
-                <SidebarContent>
-                    {renderView()}
-                </SidebarContent>
-
-                <SidebarFooter>
-
-                </SidebarFooter>
+            {/* Second sidebar with fixed width and overflow hidden when collapsed */}
+            <Sidebar
+                collapsible="none"
+                className={cn(
+                    "hidden md:block overflow-hidden transition-all duration-300 border-r",
+                    (isCollapsed && !isHovering) ? "w-0" : "w-[24rem]"
+                )}
+            >
+                <div className="w-[calc(var(--sidebar-width)_-_var(--sidebar-width-icon))] flex flex-col h-full">
+                    <SidebarHeader className="gap-3.5 border-b p-4">
+                        <div className="font-medium text-lg">{activeItem?.title}</div>
+                    </SidebarHeader>
+                    <SidebarContent className="flex-1 overflow-auto">
+                        {renderView()}
+                    </SidebarContent>
+                    <SidebarFooter>
+                    </SidebarFooter>
+                </div>
             </Sidebar>
-
-
         </Sidebar>
     )
 }
